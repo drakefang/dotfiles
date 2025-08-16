@@ -30,21 +30,27 @@ $scoopApps = @(
   "rider",
   "clion",
   "cmake",
+  "ninja",
   "firefox",
   "fork",
   "rustup",
   "scons",
-  "windows-terminal",
+  "wezterm",
   "dark",
   "everything",
+  "vcpkg",
   "lua51",
   "fd",
   "fzf",
   "lazygit",
   "win32yank",
   "gcc",
+  "llvm",
   "ripgrep",
-  "tree-sitter"
+  "tree-sitter",
+  "pwsh",
+  "starship",
+  "powertoys"
   # Add more apps here...
 )
 
@@ -89,7 +95,7 @@ function Install-MsvcBuildTools {
     Write-Log "   Starting VS Build Tools installer. Please follow the on-screen instructions."
     Write-Log "   IMPORTANT: Make sure to select the 'Desktop development with C++' workload in the installer." -Color Magenta
         
-    Start-Process -FilePath $installerPath -ArgumentList "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --quiet --wait" -Wait -PassThru
+    Start-Process -FilePath $installerPath -ArgumentList "--add Microsoft.VisualStudio.Workload.VCTools --includeRecommended --passive --wait" -Wait -PassThru
         
     if ($?) {
       Write-Log "✅ VS Build Tools installation process completed." -Color Green
@@ -135,13 +141,26 @@ function Install-ScoopApps {
     scoop bucket add versions
   }
 
+  $failedApps = [System.Collections.ArrayList]@()
+    
   foreach ($app in $apps) {
-    if (Test-CommandExists $app) {
+    if ((scoop list | Select-String -Pattern "^$app\s" -Quiet)) {
       Write-Log "✅ App '$app' is already installed. Skipping." -Color Green
     }
     else {
       Write-Log "⏳ Installing '$app' via Scoop..." -Color Yellow
       scoop install $app
+      if ($LASTEXITCODE -ne 0) {
+        Write-Log "❌ Failed to install '$app'." -Color Red
+        [void]$failedApps.Add($app)
+      }
+    }
+  }
+
+  if ($failedApps.Count -gt 0) {
+    Write-Log "--- Summary of Failed Scoop Installations ---" -Color Yellow
+    foreach ($failed in $failedApps) {
+      Write-Log "  - $failed" -Color Red
     }
   }
 }
@@ -155,8 +174,8 @@ function Install-Rust {
   }
   else {
     Write-Log "⏳ Setting up Rustup domestic mirror environment variables..." -Color Yellow
-    $env:RUSTUP_UPDATE_ROOT = "https://mirrors.aliyun.com/rustup/rustup"
-    $env:RUSTUP_DIST_SERVER = "https://mirrors.aliyun.com/rustup"
+    [Environment]::SetEnvironmentVariable("RUSTUP_UPDATE_ROOT", "https://mirrors.aliyun.com/rustup/rustup", "User")
+    [Environment]::SetEnvironmentVariable("RUSTUP_DIST_SERVER", "https://mirrors.aliyun.com/rustup", "User")
     Write-Log "   Mirror set to aliyun." -Color Green
 
     Write-Log "   Installing 'rustup' via Scoop..." -Color Yellow
@@ -199,6 +218,11 @@ function Install-RustTools {
 
 # --- Main Execution ---
 function Main {
+  if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
+    Write-Log "❌ This script must be run as an Administrator. Please right-click and 'Run as Administrator'." -Color Red
+    Read-Host "Press Enter to exit..."
+    exit 1
+  }
   Write-Log "🚀 Starting Development Environment Setup..." -Color Magenta
     
   # Run each installation module in order.
