@@ -218,11 +218,6 @@ function Install-RustTools {
 
 # --- Main Execution ---
 function Main {
-  if (-NOT ([Security.Principal.WindowsPrincipal][Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
-    Write-Log "❌ This script must be run as an Administrator. Please right-click and 'Run as Administrator'." -Color Red
-    Read-Host "Press Enter to exit..."
-    exit 1
-  }
   Write-Log "🚀 Starting Development Environment Setup..." -Color Magenta
     
   # Run each installation module in order.
