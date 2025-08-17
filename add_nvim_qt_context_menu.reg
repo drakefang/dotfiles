@@ -1,0 +1,30 @@
+Windows Registry Editor Version 5.00
+
+; Add "Open with Neovim-Qt" to the context menu for all files
+
+[HKEY_CLASSES_ROOT\*\shell\Open with Neovim-Qt]
+@="Open with Neovim-Qt"
+"Icon"="C:\\Users\\yuyzc\\scoop\\shims\\nvim-qt.exe,0"
+
+[HKEY_CLASSES_ROOT\*\shell\Open with Neovim-Qt\command]
+@="\"C:\\Users\\yuyzc\\scoop\\shims\\nvim-qt.exe\" \"%1\""
+
+
+; Add "Open with Neovim-Qt" to the context menu for folders
+
+[HKEY_CLASSES_ROOT\Directory\shell\Open with Neovim-Qt]
+@="Open with Neovim-Qt"
+"Icon"="C:\\Users\\yuyzc\\scoop\\shims\\nvim-qt.exe,0"
+
+[HKEY_CLASSES_ROOT\Directory\shell\Open with Neovim-Qt\command]
+@="\"C:\\Users\\yuyzc\\scoop\\shims\\nvim-qt.exe\" \"%1\""
+
+
+; Add "Open with Neovim-Qt" to the context menu for the background of folders
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\Open with Neovim-Qt]
+@="Open with Neovim-Qt"
+"Icon"="C:\\Users\\yuyzc\\scoop\\shims\\nvim-qt.exe,0"
+
+[HKEY_CLASSES_ROOT\Directory\Background\shell\Open with Neovim-Qt\command]
+@="\"C:\\Users\\yuyzc\\scoop\\shims\\nvim-qt.exe\" \"%V\""
